@@ -1,8 +1,13 @@
+import com.fasterxml.jackson.databind.ObjectMapper;
+
 import javax.mail.*;
 import java.awt.*;
+import java.io.File;
 import java.io.IOException;
 import java.net.URI;
 import java.net.URISyntaxException;
+import java.text.SimpleDateFormat;
+import java.util.Date;
 import java.util.Properties;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
@@ -42,6 +47,9 @@ public class EmailParser {
                             // Извлечение ссылки с использованием регулярного выражения
                             String url = "https://" + extractUrl(content);
                             System.out.println("Извлеченная ссылка: " + url);
+
+                            // Сохранение ссылки в JSON файл с текущей датой
+                            saveUrlToJson(url);
 
                             // Открытие ссылки в браузере по умолчанию
                             System.out.println("Открываем сайт!");
@@ -93,5 +101,29 @@ public class EmailParser {
         } else {
             throw new UnsupportedOperationException("Desktop browsing is not supported on this platform.");
         }
+    }
+
+    private void saveUrlToJson(String url) throws IOException {
+        ObjectMapper objectMapper = new ObjectMapper();
+        String currentDate = new SimpleDateFormat("yyyy-MM-dd_HH-mm-ss").format(new Date());
+        String fileName = "url_" + currentDate + ".json";
+
+        UrlData urlData = new UrlData(url, currentDate);
+
+        objectMapper.writeValue(new File(fileName), urlData);
+
+        System.out.println("Ссылка сохранена в файл: " + fileName);
+    }
+
+    private static class UrlData {
+        private String url;
+        private String date;
+
+        public UrlData(String url, String date) {
+            this.url = url;
+            this.date = date;
+        }
+
+        // Геттеры и сеттеры
     }
 }
