@@ -1,4 +1,5 @@
 import javax.mail.*;
+import java.io.IOException;
 import java.util.Properties;
 
 public class MailDeleter {
@@ -37,11 +38,11 @@ public class MailDeleter {
 
                     // Expunge and close the folder
                     inbox.expunge();
+                } catch (IOException e) {
+                    throw new RuntimeException(e);
                 }
             }
         } catch (MessagingException e) {
-            e.printStackTrace();
-        } catch (Exception e) {
             e.printStackTrace();
         }
     }
