@@ -7,9 +7,9 @@ public class EmailAutomation {
 	public void startAutomation() throws Exception {
 		System.out.println("Пошел движ миж");
 
-		//runEmailSender();
-		runEmailParser();
-		runMailDeleter();
+		runEmailSender();
+		//runEmailParser();
+		//runMailDeleter();
 	}
 
 	protected void runEmailSender() throws Exception {
@@ -20,7 +20,7 @@ public class EmailAutomation {
 	protected void runEmailParser() {
 		EmailParser emailParser = new EmailParser();
 		ScheduledExecutorService scheduler = Executors.newScheduledThreadPool(2);
-		int sec = 120;
+		int sec = 1;
 		scheduler.scheduleAtFixedRate(emailParser::emailParser, sec, sec, TimeUnit.SECONDS);
 		consoleCount(scheduler, sec);
 		System.out.println("Распарсили, далее удаляем письма");
