@@ -3,8 +3,29 @@
   "date" : "25.01.2024"
 }, {
   "url" : "https://hdrezka180maa.org",
+  <<<<<<<
+  HEAD
   "date" : "22.01.2024"
 }, {
   "url" : "https://https://hdrezka180maa.org",
+  =======
+  "date": "25.01.2024"
+},
+  {
+    "url": "https://hdrezka180maa.org",
+    "date": "25.01.2024"
+  },
+  {
+    "url": "https://hdrezka180maa.org",
+    "date": "22.01.2024"
+  },
+  {
+    "url": "https://hdrezka180maa.org",
+    "date": "23.01.2024"
+  },
+  {
+    "url": "https://hdrezka180maa.org",
+    >>>>>>>
+    origin/master
   "date" : "25.01.2024"
 } ]

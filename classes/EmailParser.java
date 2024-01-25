@@ -9,7 +9,6 @@ import java.text.SimpleDateFormat;
 import java.util.*;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
-import java.util.List;
 
 public class EmailParser {
 
@@ -46,8 +45,8 @@ public class EmailParser {
                             }
 
                             // Извлечение ссылки с использованием регулярного выражения
-                            String url = "https://" + extractUrl(content);
-                            System.out.println("Извлеченная ссылка: " + url);
+                            String url = STR."https://\{extractUrl(content)}";
+                            System.out.println(STR."Извлеченная ссылка: \{url}");
 
                             // Сохранение ссылки в JSON файл с текущей датой
                             urls.add(url);
@@ -122,7 +121,7 @@ public class EmailParser {
         // Записываем обновленный список обратно в файл
         objectMapper.writeValue(new File(fileName), urlList);
 
-        System.out.println("Ссылка добавлена в файл: " + fileName);
+        System.out.println(STR."Ссылка добавлена в файл: \{fileName}");
     }
 
 
@@ -138,9 +137,9 @@ public class EmailParser {
                 List<UrlData> urlList = objectMapper.readValue(latestJsonFile, objectMapper.getTypeFactory().constructCollectionType(List.class, UrlData.class));
 
                 if (!urlList.isEmpty()) {
-                    UrlData latestUrlData = urlList.get(urlList.size() - 1);
+                    UrlData latestUrlData = urlList.getLast();
 
-                    System.out.println("Открываем ссылку из последнего JSON файла: " + latestUrlData.getUrl());
+                    System.out.println(STR."Открываем ссылку из последнего JSON файла: \{latestUrlData.getUrl()}");
                     OpenBrowser.openBrowser(latestUrlData.getUrl());
                 } else {
                     System.out.println("JSON файл с сохраненными ссылками пуст.");
