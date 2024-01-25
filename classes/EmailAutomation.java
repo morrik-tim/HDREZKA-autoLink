@@ -7,7 +7,7 @@ public class EmailAutomation {
 	public void startAutomation() throws Exception {
 		System.out.println("Пошел движ миж");
 
-		runEmailSender();
+		//runEmailSender();
 		runEmailParser();
 		runMailDeleter();
 	}

@@ -1,4 +1,5 @@
 import javax.mail.*;
+import javax.mail.internet.InternetAddress;
 import java.io.IOException;
 import java.util.Properties;
 
@@ -32,7 +33,13 @@ public class MailDeleter {
                         System.out.println("---------------------------------------------");
 
                         // Delete the message
-                        message.setFlag(Flags.Flag.DELETED, true);
+                        if (isUsernameSender(message, username)) {
+                            System.out.println("Письмо не удалено");
+                        } else {
+                            // Удаление сообщения для других отправителей
+                            message.setFlag(Flags.Flag.DELETED, true);
+                            System.out.println("Письмо удалено.");
+                        }
                         System.out.println("Deleted");
                     }
 
@@ -45,5 +52,15 @@ public class MailDeleter {
         } catch (MessagingException e) {
             e.printStackTrace();
         }
+    }
+
+    private boolean isUsernameSender(Message message, String targetUsername) throws MessagingException {
+        String[] fromAddresses = InternetAddress.toString(message.getFrom()).split(",");
+        for (String fromAddress : fromAddresses) {
+            if (fromAddress.trim().equals(targetUsername)) {
+                return true; // Найден нужный отправитель
+            }
+        }
+        return false; // Не найден нужный отправитель
     }
 }

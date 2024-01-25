@@ -37,9 +37,11 @@ public class EmailSender {
             // Установка параметров письма
             message.setFrom(new InternetAddress(fromEmail));
             InternetAddress[] recipientAddresses = new InternetAddress[toEmails.length];
+
             for (int i = 0; i < toEmails.length; i++) {
                 recipientAddresses[i] = new InternetAddress(toEmails[i]);
             }
+
             message.setRecipients(Message.RecipientType.TO, recipientAddresses);
             message.setSubject(generateRandomSubject()); // Генерация случайной темы
             message.setText("");
@@ -51,21 +53,21 @@ public class EmailSender {
                 System.out.println("Письмо успешно отправлено!");
             } finally {
                 // Закрытие ресурса (Message)
-                try {
-                    message.setFlag(Flags.Flag.DELETED, true); // Установите флаг DELETED, если это необходимо
-                    message.getFolder().close(false);
-                } catch (MessagingException e) {
-                    e.printStackTrace();
+                if (message != null && message.getFolder() != null) {
+                    try {
+                        message.setFlag(Flags.Flag.DELETED, true); // Установите флаг DELETED, если это необходимо
+                        message.getFolder().close(false);
+                    } catch (MessagingException e) {
+                        e.printStackTrace();
+                    }
                 }
             }
         } catch (MessagingException e) {
-            System.out.println("Произошла ошибка при отправке письма.");
-            // TODO: Добавьте более детальную обработку ошибок
-            e.printStackTrace();
+            throw new RuntimeException(e);
         }
     }
 
-    private static String generateRandomSubject() {
+    private String generateRandomSubject() {
         // Генерация случайной темы
         String[] subjects = {"Important Information", "Hello", "Meeting Agenda", "Update", "Urgent Request"};
         int randomIndex = (int) (Math.random() * subjects.length);
