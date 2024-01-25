@@ -5,6 +5,6 @@ public class RunClass {
 
     private static void runEmailAutomation() throws Exception {
         EmailAutomation automation = new EmailAutomation();
-        automation.startAutomation();
+        automation.emailAutomation();
     }
 }

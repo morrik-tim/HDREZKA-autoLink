@@ -1,18 +1,15 @@
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.databind.SerializationFeature;
 
 import javax.mail.*;
-import java.awt.*;
 import java.io.File;
 import java.io.IOException;
-import java.net.URI;
 import java.net.URISyntaxException;
 import java.text.SimpleDateFormat;
-import java.util.Arrays;
-import java.util.Comparator;
-import java.util.Date;
-import java.util.Properties;
+import java.util.*;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
+import java.util.List;
 
 public class EmailParser {
 
@@ -22,6 +19,8 @@ public class EmailParser {
         String email = EmailSender.MY_EMAIL; // адрес получателя
         String password = EmailSender.MY_PASSWORD; // Пароль от вашей почты
         String mirrorEmail = EmailSender.MIRROR_EMAIL; // Адрес получателя
+
+        List<String> urls = new ArrayList<>();
 
         Properties properties = new Properties();
         properties.put("mail.imap.host", host);
@@ -51,11 +50,11 @@ public class EmailParser {
                             System.out.println("Извлеченная ссылка: " + url);
 
                             // Сохранение ссылки в JSON файл с текущей датой
+                            urls.add(url);
                             saveUrlToJson(url);
 
                             // Открытие ссылки в браузере по умолчанию
                             System.out.println("Открываем сайт!");
-                            //openBrowser(url);
                             openLatestUrl();
                             break;
                         }
@@ -98,58 +97,36 @@ public class EmailParser {
         }
     }
 
-    private void openBrowser(String url) throws URISyntaxException, IOException {
-        if (Desktop.isDesktopSupported() && Desktop.getDesktop().isSupported(Desktop.Action.BROWSE)) {
-            Desktop.getDesktop().browse(new URI(url));
-        } else {
-            throw new UnsupportedOperationException("Desktop browsing is not supported on this platform.");
-        }
-    }
-
     private void saveUrlToJson(String url) throws IOException {
+        // Путь к файлу с постоянным именем
+        String fileName = "./список_ссылок.json";
+
         ObjectMapper objectMapper = new ObjectMapper();
-        String currentDate = new SimpleDateFormat("yyyy-MM-dd_HH-mm-ss").format(new Date());
-        String fileName = "url_" + currentDate + ".json";
+        objectMapper.enable(SerializationFeature.INDENT_OUTPUT);
 
-        UrlData urlData = new UrlData(url, currentDate);
+        // Создаем объект списка ссылок
+        List<UrlData> urlList;
 
-        objectMapper.writeValue(new File(fileName), urlData);
+        // Пытаемся прочитать существующий файл, если он существует
+        try {
+            urlList = objectMapper.readValue(new File(fileName), objectMapper.getTypeFactory().constructCollectionType(List.class, UrlData.class));
+        } catch (IOException e) {
+            // Если файл не существует или не удается прочитать, создаем новый список
+            urlList = new ArrayList<>();
+        }
 
-        System.out.println("Ссылка сохранена в файл: " + fileName);
+        // Добавляем новую ссылку в список
+        String currentDate = new SimpleDateFormat("dd.MM.yyyy").format(new Date());
+        urlList.add(new UrlData(url, currentDate));
+
+        // Записываем обновленный список обратно в файл
+        objectMapper.writeValue(new File(fileName), urlList);
+
+        System.out.println("Ссылка добавлена в файл: " + fileName);
     }
 
-    private static class UrlData {
-        private String url;
-        private String date;
 
-        // Пустой конструктор для Jackson
-        public UrlData() {
-        }
-
-        public UrlData(String url, String date) {
-            this.url = url;
-            this.date = date;
-        }
-
-        // Геттеры и сеттеры
-        public String getUrl() {
-            return url;
-        }
-
-        public void setUrl(String url) {
-            this.url = url;
-        }
-
-        public String getDate() {
-            return date;
-        }
-
-        public void setDate(String date) {
-            this.date = date;
-        }
-    }
-
-    private void openLatestUrl() {
+    public static void openLatestUrl() {
         try {
             File[] jsonFiles = new File(".").listFiles((dir, name) -> name.endsWith(".json"));
 
@@ -158,13 +135,20 @@ public class EmailParser {
                 File latestJsonFile = jsonFiles[jsonFiles.length - 1];
 
                 ObjectMapper objectMapper = new ObjectMapper();
-                UrlData latestUrlData = objectMapper.readValue(latestJsonFile, UrlData.class);
+                List<UrlData> urlList = objectMapper.readValue(latestJsonFile, objectMapper.getTypeFactory().constructCollectionType(List.class, UrlData.class));
 
-                System.out.println("Открываем ссылку из последнего JSON файла: " + latestUrlData.getUrl());
+                if (!urlList.isEmpty()) {
+                    UrlData latestUrlData = urlList.get(urlList.size() - 1);
+
+                    System.out.println("Открываем ссылку из последнего JSON файла: " + latestUrlData.getUrl());
+                    OpenBrowser.openBrowser(latestUrlData.getUrl());
+                } else {
+                    System.out.println("JSON файл с сохраненными ссылками пуст.");
+                }
             } else {
                 System.out.println("Нет JSON файлов с сохраненными ссылками.");
             }
-        } catch (IOException e) {
+        } catch (IOException | URISyntaxException e) {
             e.printStackTrace();
         }
     }

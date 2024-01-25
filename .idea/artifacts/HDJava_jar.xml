@@ -5,6 +5,9 @@
       <element id="module-output" name="HDJava" />
       <element id="extracted-dir" path="$PROJECT_DIR$/lib/javax.mail-1.6.2.jar" path-in-jar="/" />
       <element id="extracted-dir" path="$PROJECT_DIR$/lib/activation-1.1.jar" path-in-jar="/" />
+      <element id="extracted-dir" path="$PROJECT_DIR$/lib/jackson-core-2.16.1.jar" path-in-jar="/" />
+      <element id="extracted-dir" path="$PROJECT_DIR$/lib/jackson-databind-2.16.1.jar" path-in-jar="/" />
+      <element id="extracted-dir" path="$PROJECT_DIR$/lib/jackson-annotations-2.16.1.jar" path-in-jar="/" />
     </root>
   </artifact>
 </component>
