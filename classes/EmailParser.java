@@ -12,6 +12,33 @@ import java.util.regex.Pattern;
 
 public class EmailParser {
 
+    public static void openLatestUrl() {
+        try {
+            File[] jsonFiles = new File(".").listFiles((dir, name) -> name.endsWith(".json"));
+
+            if (jsonFiles != null && jsonFiles.length > 0) {
+                Arrays.sort(jsonFiles, Comparator.comparingLong(File::lastModified));
+                File latestJsonFile = jsonFiles[jsonFiles.length - 1];
+
+                ObjectMapper objectMapper = new ObjectMapper();
+                List<UrlData> urlList = objectMapper.readValue(latestJsonFile, objectMapper.getTypeFactory().constructCollectionType(List.class, UrlData.class));
+
+                if (!urlList.isEmpty()) {
+                    UrlData latestUrlData = urlList.get(urlList.size() - 1);
+
+                    System.out.println("Открываем ссылку из последнего JSON файла: " + latestUrlData.getUrl());
+                    OpenBrowser.openBrowser(latestUrlData.getUrl());
+                } else {
+                    System.out.println("JSON файл с сохраненными ссылками пуст.");
+                }
+            } else {
+                System.out.println("Нет JSON файлов с сохраненными ссылками.");
+            }
+        } catch (IOException | URISyntaxException e) {
+            e.printStackTrace();
+        }
+    }
+
     public void emailParser() {
         // Ваши данные для получения почты
         String host = "imap.mail.ru"; // Укажите адрес вашего IMAP-сервера
@@ -45,8 +72,8 @@ public class EmailParser {
                             }
 
                             // Извлечение ссылки с использованием регулярного выражения
-                            String url = STR."https://\{extractUrl(content)}";
-                            System.out.println(STR."Извлеченная ссылка: \{url}");
+                            String url = "https://" + extractUrl(content);
+                            System.out.println("Извлеченная ссылка: " + url);
 
                             // Сохранение ссылки в JSON файл с текущей датой
                             urls.add(url);
@@ -121,34 +148,6 @@ public class EmailParser {
         // Записываем обновленный список обратно в файл
         objectMapper.writeValue(new File(fileName), urlList);
 
-        System.out.println(STR."Ссылка добавлена в файл: \{fileName}");
-    }
-
-
-    public static void openLatestUrl() {
-        try {
-            File[] jsonFiles = new File(".").listFiles((dir, name) -> name.endsWith(".json"));
-
-            if (jsonFiles != null && jsonFiles.length > 0) {
-                Arrays.sort(jsonFiles, Comparator.comparingLong(File::lastModified));
-                File latestJsonFile = jsonFiles[jsonFiles.length - 1];
-
-                ObjectMapper objectMapper = new ObjectMapper();
-                List<UrlData> urlList = objectMapper.readValue(latestJsonFile, objectMapper.getTypeFactory().constructCollectionType(List.class, UrlData.class));
-
-                if (!urlList.isEmpty()) {
-                    UrlData latestUrlData = urlList.getLast();
-
-                    System.out.println(STR."Открываем ссылку из последнего JSON файла: \{latestUrlData.getUrl()}");
-                    OpenBrowser.openBrowser(latestUrlData.getUrl());
-                } else {
-                    System.out.println("JSON файл с сохраненными ссылками пуст.");
-                }
-            } else {
-                System.out.println("Нет JSON файлов с сохраненными ссылками.");
-            }
-        } catch (IOException | URISyntaxException e) {
-            e.printStackTrace();
-        }
+        System.out.println("Ссылка добавлена в файл: " + fileName);
     }
 }

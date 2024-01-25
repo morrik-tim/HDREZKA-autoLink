@@ -4,6 +4,7 @@ import java.util.concurrent.TimeUnit;
 
 public class EmailAutomation {
 	private EmailChecker emailChecker;
+
 	public void emailAutomation() throws Exception {
 		System.out.println("Пошел движ миж");
 
@@ -55,6 +56,7 @@ public class EmailAutomation {
 			}
 		}
 	}
+
 	private void consoleCount(ScheduledExecutorService scheduler, int seconds) {
 		int countdown = seconds; // Время в секундах
 		while (countdown > 0) {
