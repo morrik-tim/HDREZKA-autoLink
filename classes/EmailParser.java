@@ -7,6 +7,8 @@ import java.io.IOException;
 import java.net.URI;
 import java.net.URISyntaxException;
 import java.text.SimpleDateFormat;
+import java.util.Arrays;
+import java.util.Comparator;
 import java.util.Date;
 import java.util.Properties;
 import java.util.regex.Matcher;
@@ -17,7 +19,7 @@ public class EmailParser {
     public void emailParser() {
         // Ваши данные для получения почты
         String host = "imap.mail.ru"; // Укажите адрес вашего IMAP-сервера
-        String email = EmailSender.MY_EMAIL; // ��дрес получателя
+        String email = EmailSender.MY_EMAIL; // адрес получателя
         String password = EmailSender.MY_PASSWORD; // Пароль от вашей почты
         String mirrorEmail = EmailSender.MIRROR_EMAIL; // Адрес получателя
 
@@ -53,7 +55,8 @@ public class EmailParser {
 
                             // Открытие ссылки в браузере по умолчанию
                             System.out.println("Открываем сайт!");
-                            openBrowser(url);
+                            //openBrowser(url);
+                            openLatestUrl();
                             break;
                         }
                     }
@@ -119,11 +122,50 @@ public class EmailParser {
         private String url;
         private String date;
 
+        // Пустой конструктор для Jackson
+        public UrlData() {
+        }
+
         public UrlData(String url, String date) {
             this.url = url;
             this.date = date;
         }
 
         // Геттеры и сеттеры
+        public String getUrl() {
+            return url;
+        }
+
+        public void setUrl(String url) {
+            this.url = url;
+        }
+
+        public String getDate() {
+            return date;
+        }
+
+        public void setDate(String date) {
+            this.date = date;
+        }
+    }
+
+    private void openLatestUrl() {
+        try {
+            File[] jsonFiles = new File(".").listFiles((dir, name) -> name.endsWith(".json"));
+
+            if (jsonFiles != null && jsonFiles.length > 0) {
+                Arrays.sort(jsonFiles, Comparator.comparingLong(File::lastModified));
+                File latestJsonFile = jsonFiles[jsonFiles.length - 1];
+
+                ObjectMapper objectMapper = new ObjectMapper();
+                UrlData latestUrlData = objectMapper.readValue(latestJsonFile, UrlData.class);
+
+                System.out.println("Открываем ссылку из последнего JSON файла: " + latestUrlData.getUrl());
+            } else {
+                System.out.println("Нет JSON файлов с сохраненными ссылками.");
+            }
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
     }
 }
